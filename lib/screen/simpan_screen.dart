@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:syncfusion_flutter_maps/maps.dart';
 
@@ -32,6 +33,36 @@ class _SimpanScreenState extends State<SimpanScreen> {
     }
 
     return await location.getLocation();
+  }
+
+  Future<void> _simpanPresensi(double latitude, double longitude) async {
+    // Ganti URL_API dengan URL API Anda
+    var url =
+        Uri.parse('http://10.0.2.2/aplikasi_absensi_api/simpan_presensi.php');
+
+    // Buat payload untuk data yang akan disimpan
+    var body = {
+      'latitude': latitude.toString(),
+      'longitude': longitude.toString(),
+    };
+
+    // Kirim permintaan HTTP POST ke server
+    var response = await http.post(url, body: body);
+
+    if (response.statusCode == 200) {
+      // Jika data berhasil disimpan, tampilkan pesan sukses
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Presensi berhasil disimpan!'),
+      ));
+
+      // Kembali ke home screen setelah presensi tersimpan
+      Navigator.pop(context);
+    } else {
+      // Jika terjadi kesalahan, tampilkan pesan error
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Gagal menyimpan presensi!'),
+      ));
+    }
   }
 
   @override
@@ -79,7 +110,14 @@ class _SimpanScreenState extends State<SimpanScreen> {
                       height: 20,
                     ),
                     ElevatedButton(
-                        onPressed: () {}, child: Text("Simpan Presensi"))
+                      onPressed: () {
+                        _simpanPresensi(
+                          currentLocation.latitude!,
+                          currentLocation.longitude!,
+                        );
+                      },
+                      child: Text("Simpan Presensi"),
+                    )
                   ],
                 ),
               );

@@ -1,14 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:project_expo/screen/login.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({Key? key}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  late String _nama = ""; // Variabel untuk menyimpan nama
+  late String _jabatan = ""; // Variabel untuk menyimpan jabatan
+
+  @override
+  void initState() {
+    super.initState();
+    // Panggil fungsi untuk mengambil data dari database saat widget pertama kali dibuat
+    fetchData();
+  }
+
+  // Fungsi untuk mengambil data dari database
+  void fetchData() async {
+    final response = await http
+        .get(Uri.parse('http://10.0.2.2/aplikasi_absensi_api/biodata.php'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      // Ambil data nama dan jabatan dari hasil response
+      _nama = data[0]['nama'];
+      _jabatan = data[0]['jabatan'];
+      setState(() {}); // Memperbarui tampilan setelah mendapatkan data
+    } else {
+      throw Exception('Failed to load biodata');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,22 +54,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: NetworkImage(
-                      "https://i.pravda.ru/i/img/srv/photos/779770/779770_960x600_1.jpg"),
-                ),
                 SizedBox(width: 20),
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Text(
-                      "Dwiky Chandra Mulyo Utomo",
+                      _nama,
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      "HRD",
+                      _jabatan,
                       style: TextStyle(fontSize: 14),
                     ),
                   ],
@@ -70,11 +93,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Text("Nama     : Dwiky Chandra Mulyo Utomo",
+                              Text("Nama     : $_nama",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold)),
-                              Text("Jabatan : HRD",
+                              Text("Jabatan : $_jabatan",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold)),

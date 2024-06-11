@@ -19,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       final response = await http.post(
-        Uri.parse('http://localhost/aplikasi_absensi_api/login.php'),
+        Uri.parse('http://10.0.2.2/aplikasi_absensi_api/login.php'),
         body: {
           'email': _emailController.text,
           'password': _passwordController.text,
